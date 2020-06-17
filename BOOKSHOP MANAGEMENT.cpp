@@ -2,6 +2,7 @@
 #include<conio.h>
 #include<string.h>
 #include<stdlib.h>
+#define MAX 256
 
 char date[20];
 char uname[20];
@@ -80,6 +81,101 @@ void display(char da[20],char cnn[20])
 	}
   }
 
+//function to edit data on a date
+
+  void edit(char da[20],char cnn[20])
+  {
+    FILE *fp;
+    FILE *fptr1, *fptr2;
+    int  linectr = 1;
+    int lno=1;
+    char str[MAX],fname[MAX];        
+    int res,cnam;
+    char bnam[20];
+    char mn[15];
+    long int cos;
+    int flag;
+    fp=fopen("Record.txt","r");
+  	
+  	//while loop to find line number of the date and to check if record exists
+  	while(fscanf(fp,"%s %s %s %s %ld",date,uname,bname,mno,&cost)!=EOF)
+  	{
+  	    res = strcmp(date,da);
+  	    cnam = strcmp(uname,cnn);
+  	    if((res==0)&&(cnam==0))
+  	    {
+  	       flag=1;
+	       break; 
+	    }
+	    else
+	    {
+	    	lno++;
+	    	flag=0;
+	    }
+	}
+	if(flag==1)
+	{
+	lno++;
+	fclose(fp);
+	fptr1=fopen("Record.txt","r");
+	fptr2=fopen("temp.txt","w");
+	printf("\nEnter mobile number to be changed        :: ");
+	scanf("%s",mn);
+	printf("\nEnter Name of the book to be changed     :: ");
+	scanf("%s",bnam);
+	printf("\nEnter cost of the book to be changed     :: ");
+	scanf("%ld",&cos);
+	
+        // copy all contents to the temporary file other except specific line
+        while (!feof(fptr1)) 
+        {
+            fgets(str, MAX, fptr1);
+            if (!feof(fptr1)) 
+            {
+                if (linectr != lno) 
+                    {
+                        fprintf(fptr2, "%s", str);
+                        linectr++;
+                    } 
+                    else 
+                    {
+                        fprintf(fptr2, "%s %s %s %s %ld\n",da,cnn,bnam,mn,cos);
+                        linectr++;
+                    }
+            }
+        }
+        fclose(fptr1);
+        fclose(fptr2);
+        
+        //deleting pre-existing record
+        remove("Record.txt");
+        
+        //copying contents of temp to record
+        fptr1=fopen("temp.txt","r");
+        fptr2=fopen("Record.txt","w");
+         while (!feof(fptr1)) 
+        {
+            fgets(str, MAX, fptr1);
+            if (!feof(fptr1)) 
+            {  
+             fprintf(fptr2, "%s", str);         
+            }
+        }
+        fclose(fptr1);
+        fclose(fptr2);
+        
+        //removing temp file
+        remove("temp.txt");
+        
+        printf(" \n\tReplacement did successfully..!! \n");
+    }
+    else
+    {
+    	printf("\n\t\t\tRecord not found!!!\n");
+    	printf("\tPress <1> in choice list to create a new record");
+	}
+}
+
  //main function
    
   int main()  
@@ -93,6 +189,7 @@ void display(char da[20],char cnn[20])
 		printf("\n\n\t CHOICE LIST");
 		printf("\n\n Press <1> to create entry for book");
 		printf("\n Press <2> to display on specific date");
+		printf("\n Press <3> to edit a data");
 		printf("\n Press <0> to exit");
 		printf("\n\nEnter choice  ::");
 		scanf("%d",&ch);
@@ -114,6 +211,16 @@ void display(char da[20],char cnn[20])
 			    display(lm,cn);
 			    break;
 			    }
+			case 3:
+			   {
+			   printf("\nPlease enter date in dd-mm-yyyy format\n");
+			   printf("Enter the date        :: ");
+			   scanf("%s",lm);
+			   printf("\nEnter customer name   :: ");
+			   scanf("%s",cn);
+			   edit(lm,cn);
+			   break;
+		           }
 			case 0:
 			    {
 			    exit(0);

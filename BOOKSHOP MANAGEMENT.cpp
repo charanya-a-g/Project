@@ -3,6 +3,14 @@
 #include<string.h>
 #include<stdlib.h>
 
+char date[20];
+char uname[20];
+char bname[20];
+char mno[15];
+long int cost;
+int n;
+int i;
+
 //function for writing entry book into file
 
 void write()
@@ -35,6 +43,42 @@ void write()
 	fclose(fp);
 	printf("\n\tRecord written successfully!!!!");
 }
+
+//function to display the record by date
+
+void display(char da[20],char cnn[20])
+{
+	FILE *fp;
+	int res;
+	int cnam;
+	int flag;
+	fp=fopen("Record.txt","r");
+	while(fscanf(fp,"%s %s %s %s %ld",date,uname,mno,bname,&cost)!=EOF)
+	{
+		res = strcmp(date,da);
+		cnam = strcmp(uname,cnn);
+		if((res==0)&&(cnam==0))
+		{
+			flag=1;
+			printf("\n Mobile num   :: %s",mno);
+			printf("\n Book name    :: %s",bname);
+			printf("\n Book cost    :: %ld",cost);
+			break;
+			
+		}
+		else
+		{
+			flag=0;
+		}
+	} //end of while loop
+	
+	fclose(fp);
+	if(flag==0)
+	{
+		printf("\n\t\t\t\tNo such record found!!!!!");
+		printf("\n\tPlease enter the choice as <1> in the choice list to create a record!! ");
+	}
+  }
 
  //main function
    

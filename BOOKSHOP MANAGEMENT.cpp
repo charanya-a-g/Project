@@ -98,7 +98,7 @@ void display(char da[20],char cnn[20])
     fp=fopen("Record.txt","r");
   	
   	//while loop to find line number of the date and to check if record exists
-  	while(fscanf(fp,"%s %s %s %s %ld",date,uname,bname,mno,&cost)!=EOF)
+  	while(fscanf(fp,"%s %s %s %s %ld",date,uname,mno,bname,&cost)!=EOF)
   	{
   	    res = strcmp(date,da);
   	    cnam = strcmp(uname,cnn);
@@ -113,10 +113,10 @@ void display(char da[20],char cnn[20])
 	    	flag=0;
 	    }
 	}
+	fclose(fp);
 	if(flag==1)
 	{
 	lno++;
-	fclose(fp);
 	fptr1=fopen("Record.txt","r");
 	fptr2=fopen("temp.txt","w");
 	printf("\nEnter mobile number to be changed        :: ");
@@ -139,7 +139,7 @@ void display(char da[20],char cnn[20])
                     } 
                     else 
                     {
-                        fprintf(fptr2, "%s %s %s %s %ld\n",da,cnn,bnam,mn,cos);
+                        fprintf(fptr2, "%s %s %s %s %ld\n",da,cnn,mn,bnam,cos);
                         linectr++;
                     }
             }

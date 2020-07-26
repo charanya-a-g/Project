@@ -1,148 +1,203 @@
 #include<stdio.h>
-#include<conio.h>
 #include<string.h>
+#include<conio.h>
 #include<stdlib.h>
-#define MAX 256
+#define MAX 500
 
-char date[20];
-char uname[20];
-char bname[20];
-char mno[15];
-long int cost;
-int n;
-int i;
+void newentry();
+void edit(char e_bnam[100]);
+void billing();
+void search();
 
-//function for writing entry book into file
+void mainmenu()
+{
+	int ch,ach,flag;
+	char unam[100],pw[100];
+	char uname[100],pwrd[100],urnam[100],pswrd[100];
+	char ebnam[100];
+	FILE *fp, *fptr;
+	do
+	{
+		printf("\n\n\t\t\t\t***************WELCOME TO BOOKSHOP****************");
+		printf("\n\n\t\tMAIN MENU");
+		printf("\n Press <1> if Admin");
+		printf("\n Press <2> if Customer");
+		printf("\n Press <0> to exit");
+		printf("\n\n Enter choice  ::  ");
+		scanf("%d",&ch);
+	switch(ch)
+	{
+		case 1 :
+			{
+			 printf("\n Enter Username  :: ");
+			 scanf("%s",unam);
+			 printf("\n Enter Password  :: ");
+			 scanf("%s",pw);
+			 fp=fopen("password.txt","r");
+			 fscanf(fp,"%s %s",uname,pwrd);
+			 if(((strcmp(unam,uname))==0)&&((strcmp(pw,pwrd))==0))
+			 {  
+			   do
+			    {
+			 	printf("\n\n\nPress <1> to create new entry for book");
+            	printf("\nPress <2> to edit the record");
+	            printf("\nPress <3> to change username and password");
+	            printf("\nPress <4> to create sales record");
+	            printf("\nPress <0> to go to main menu");
+	            printf("\n\nEnter choice  :: ");
+	            scanf("%d",&ach);
+	            switch(ach)
+	               {
+	            	case 1 :
+	            		{
+	            			newentry();
+	            			break;
+						}
+					case 2 :
+						{
+							printf("\nEnter the exact name of the book  :: ");
+							scanf("%s",ebnam);
+							edit(ebnam);
+							break;
+						}
+					case 3 :
+						{ 
+						    printf("\nEnter the new Username   :: ");
+						    scanf("%s",urnam);
+						    printf("\nEnter the new password   :: ");
+						    scanf("%s",pswrd);
+						    fclose(fp);
+						    flag=1;
+							remove("password.txt");
+							fptr=fopen("password.txt","a");
+							fprintf(fptr,"%s %s",urnam,pswrd);
+							fclose(fptr);
+							break;
+						}
+					case 4 :
+						{
+							billing();
+						}
+					case 0 :
+						{
+							mainmenu();
+						}
+					default :
+						{
+							printf("\n\n\t\tInvalid selection!!!!!");
+						}
+			    	}//end of switch
+	            }while(ach!=0);
+			 }//end of if
+			 else
+			 {
+			 	printf("\n\n\tInvalid Username or Password");
+			 }
+			 if(flag!=1)
+			 {
+			 fclose(fp);
+             }
+			 break;
+			}//end of main case 1
+		case 2 :
+			{
+			 search();
+			 break;
+			}
+		case 0 :
+		    {
+		      exit(0);
+			}
+		default:
+			{
+				printf("\t\t\tInvalid choice !!!");
+			}
+	}//end of main switch
+	getch();
+    } while(ch!=0);
+}
 
-void write()
+void newentry()
 {
 	FILE *fp;
-	char dat[20];
-	char unam[20];
-	char bnam[20];
-	char mn[15];
-	long int cos;
+	char bnam[100];
+	char aut[100];
+	char loc[100];
+	long int price;
+	long int count;
 	
-	printf("\nEnter Date(dd-mm-yyyy)   :: ");
-	scanf("%s",dat);
-	
-	printf("\nEnter Name of Customer   :: ");
-	scanf("%s",unam);
-	
-	printf("\nEnter mobile number      :: ");
-	scanf("%s",mn);
-	
-	printf("\nEnter Name of the book   :: ");
+	printf("\nEnter Name of the book                 :: ");
 	scanf("%s",bnam);
 	
-	printf("\nEnter cost of the book   :: ");
-	scanf("%ld",&cos);
+	printf("\nEnter Author name                      :: ");
+	scanf("%s",aut);
+	
+	printf("\nEnter location                         :: ");
+	scanf("%s",loc);
+	
+	printf("\nEnter price of the book(numbers only)  :: ");
+	scanf("%ld",&price);
+	 
+	printf("\nEnter count of the book(numbers only)  :: ");
+	scanf("%ld",&count);
 	
 	fp=fopen("Record.txt","a");
 	
-	fprintf(fp,"\n%s %s %s %s %ld\n",dat,unam,mn,bnam,cos);
+	fprintf(fp,"\n%s %s %s %ld %ld\n",bnam,aut,loc,price,count);
 	fclose(fp);
 	printf("\n\tRecord written successfully!!!!");
+    
 }
 
-//function to display the record by date
-
-void display(char da[20],char cnn[20])
+void edit(char e_bnam[20])
 {
-	FILE *fp;
-	int res;
-	int cnam;
+  	FILE *fp , *fptr1, *fptr2;
+    int  linectr = 1,lno=1;
+    char str[MAX];        
+	char ebname[100],eaut[100],eloc[100],eeloc[100];
+	long int ecount,eprice,eecount,eeprice;
 	int flag;
-	fp=fopen("Record.txt","r");
-	while(fscanf(fp,"%s %s %s %s %ld",date,uname,mno,bname,&cost)!=EOF)
-	{
-		res = strcmp(date,da);
-		cnam = strcmp(uname,cnn);
-		if((res==0)&&(cnam==0))
-		{
-			flag=1;
-			printf("\n Mobile num   :: %s",mno);
-			printf("\n Book name    :: %s",bname);
-			printf("\n Book cost    :: %ld",cost);
-			break;
-			
-		}
-		else
-		{
-			flag=0;
-		}
-	} //end of while loop
-	
-	fclose(fp);
-	if(flag==0)
-	{
-		printf("\n\t\t\t\tNo such record found!!!!!");
-		printf("\n\tPlease enter the choice as <1> in the choice list to create a record!! ");
-	}
-  }
-
-//function to edit data on a date
-
-  void edit(char da[20],char cnn[20])
-  {
-    FILE *fp;
-    FILE *fptr1, *fptr2;
-    int  linectr = 1;
-    int lno=1;
-    char str[MAX],fname[MAX];        
-    int res,cnam;
-    char bnam[20];
-    char mn[15];
-    long int cos;
-    int flag;
-    fp=fopen("Record.txt","r");
+  	fp=fopen("Record.txt","r");
   	
   	//while loop to find line number of the date and to check if record exists
-  	while(fscanf(fp,"%s %s %s %s %ld",date,uname,mno,bname,&cost)!=EOF)
+  	while(fscanf(fp,"%s %s %s %ld %ld",ebname,eaut,eloc,&eprice,&ecount)!=EOF)
   	{
-  	    res = strcmp(date,da);
-  	    cnam = strcmp(uname,cnn);
-  	    if((res==0)&&(cnam==0))
-  	    {
-  	       flag=1;
+  		if(strcmp(ebname,e_bnam)==0)
+  		{
+  		   flag=1;
 	       break; 
 	    }
 	    else
 	    {
 	    	lno++;
 	    	flag=0;
-	    }
+		}
 	}
 	fclose(fp);
 	if(flag==1)
 	{
-	lno++;
 	fptr1=fopen("Record.txt","r");
 	fptr2=fopen("temp.txt","w");
-	printf("\nEnter mobile number to be changed        :: ");
-	scanf("%s",mn);
-	printf("\nEnter Name of the book to be changed     :: ");
-	scanf("%s",bnam);
-	printf("\nEnter cost of the book to be changed     :: ");
-	scanf("%ld",&cos);
+	printf("\nEnter the location to be changed        :: ");
+	scanf("%s",eeloc);
+	printf("\nEnter the price to be changed           :: ");
+	scanf("%ld",&eeprice);
+	printf("\nEnter the count to be changed           :: ");
+	scanf("%ld",&eecount);
 	
-        // copy all contents to the temporary file other except specific line
-        while (!feof(fptr1)) 
+	    // copy all contents to the temporary file other except specific line
+        while (fscanf(fptr1,"%s %s %s %ld %ld",ebname,eaut,eloc,&eprice,&ecount)!=EOF) 
         {
-            fgets(str, MAX, fptr1);
-            if (!feof(fptr1)) 
-            {
                 if (linectr != lno) 
                     {
-                        fprintf(fptr2, "%s", str);
+                        fprintf(fptr2,"\n%s %s %s %ld %ld\n",ebname,eaut,eloc,eprice,ecount);
                         linectr++;
                     } 
                     else 
                     {
-                        fprintf(fptr2, "%s %s %s %s %ld\n",da,cnn,mn,bnam,cos);
+                        fprintf(fptr2, "\n%s %s %s %ld %ld\n",ebname,eaut,eeloc,eeprice,eecount);
                         linectr++;
                     }
-            }
         }
         fclose(fptr1);
         fclose(fptr2);
@@ -171,71 +226,173 @@ void display(char da[20],char cnn[20])
     }
     else
     {
-    	printf("\n\t\t\tRecord not found!!!\n");
-    	printf("\tPress <1> in choice list to create a new record");
+    	printf("\n\t\t\tBook not found!!!\n");
 	}
+	
 }
 
- //main function
-   
-  int main()  
-  {
-        int ch;
-        char lm[20];
-	char cn[20];
+void billing()
+{
+	FILE *fptr1,*fptr2,*fptr3,*fp;
+	char da[20],cnam[30],book[200][100],bn[100];
+	char ebname[100],eaut[100],eloc[100];
+	char str[MAX];
+	long int ecount,eprice,cou,newcou,ccou,total=0;
+	int ch=1,i=0,n=0,price[200],count[200],cost[200],flag;
+	int  linectr = 1,lno=1;
+	printf("\nEnter date (dd-mm-yyyy)              ::  ");
+	scanf("%s",da);
+	printf("\nEnter Customer name(capital letters) ::  ");
+	scanf("%s",cnam);
 	do
 	{
-		printf("\n\n\n\t\tWELCOME TO BOOK SHOP\n");
-		printf("\n\n\t CHOICE LIST");
-		printf("\n\n Press <1> to create entry for book");
-		printf("\n Press <2> to display on specific date");
-		printf("\n Press <3> to edit a data");
-		printf("\n Press <0> to exit");
-		printf("\n\nEnter choice  ::");
+		printf("\nPress <1> for new book");
+		printf("\nPress <0> to terminate");
+		printf("\nEnter the choice::");
 		scanf("%d",&ch);
-		
+	
 		switch(ch)
 		{
-			case 1:
-			   {
-			   write();
-			   break;
+			case 1 :
+		    {
+		        printf("\nEnter book name     :: ");
+		        scanf("%s",bn);
+	        	fp=fopen("Record.txt","r");
+		        while(fscanf(fp,"%s %s %s %ld %ld",ebname,eaut,eloc,&eprice,&ecount)!=EOF)
+     	        {
+  	               if(strcmp(ebname,bn)==0)
+  		           {
+  		              flag=1;
+  		              ccou=ecount;
+	                  break; 
+	               }
+	               else
+	               {
+	    	          lno++;
+	    	          flag=0;
 		           }
-			case 2:
-			    {
-		            printf("\nPlease enter date in dd-mm-yyyy format\n");
-		            printf("Enter the date    :: ");
-			    scanf("%s",lm);
-			    printf("\nEnter customer name :: ");
-			    scanf("%s",cn);
-			    display(lm,cn);
-			    break;
-			    }
-			case 3:
-			   {
-			   printf("\nPlease enter date in dd-mm-yyyy format\n");
-			   printf("Enter the date        :: ");
-			   scanf("%s",lm);
-			   printf("\nEnter customer name   :: ");
-			   scanf("%s",cn);
-			   edit(lm,cn);
-			   break;
-		           }
-			case 0:
-			    {
-			    exit(0);
-			    }
-			default:
-			   {
-			    printf("\nInvalid selection");
-			    printf("\nPlease check the choice list!!");
-			    }
-		}//end of switch case
-		getch();
-		
-	}//end of do while loop
-	while(ch !=0);
-	
+	            }
+	            fclose(fp);
+	            if (flag==1)
+	            {       
+	                printf("\nEnter the count of book required   :: ");
+		            scanf("%ld",&cou);
+		            if(ccou<cou)
+		            {
+		   	           printf("\nStock availability is %ld",ccou);
+		   	           printf("\nAvailability of book is less!!!You can change your order according to stock availability...do you want to continue?");
+		   	           break;
+		            }
+		            else
+		            { 
+		                count[i]=cou;
+		   	            newcou=ccou-cou;
+		                fptr1=fopen("Record.txt","r");
+	                    fptr2=fopen("temp.txt","w");	
+	       
+	                     // copy all contents to the temporary file other except specific line
+                        while (fscanf(fptr1,"%s %s %s %ld %ld",ebname,eaut,eloc,&eprice,&ecount)!=EOF) 
+                        {
+                           if (linectr != lno) 
+                           {
+                              fprintf(fptr2,"\n%s %s %s %ld %ld\n",ebname,eaut,eloc,eprice,ecount);
+                              linectr++;
+                           } 
+                           else 
+                           {
+                               fprintf(fptr2, "\n%s %s %s %ld %ld\n",ebname,eaut,eloc,eprice,newcou);
+                               strcpy(book[i],ebname);
+                               price[i]=eprice;
+                               cost[i]=price[i]*count[i];
+                               i++;
+                               linectr++;
+                               n++;
+                           }
+                       }
+                       fclose(fptr1);
+                       fclose(fptr2);
+                       lno=1;
+                       linectr=1;
+                       //deleting pre-existing record
+                       remove("Record.txt");
+        
+                       //copying contents of temp to record
+                       fptr1=fopen("temp.txt","r");
+                       fptr2=fopen("Record.txt","w");
+                       while (!feof(fptr1)) 
+                       {
+                          fgets(str, MAX, fptr1);
+                          if (!feof(fptr1)) 
+                          {  
+                              fprintf(fptr2, "%s", str);         
+                          }
+                       }
+                       fclose(fptr1);
+                       fclose(fptr2);
+        
+                       //removing temp file
+                      remove("temp.txt");
+                   }
+		       }
+		       else
+               {
+    	           printf("\n\t\t\tBook not found!!!\n");
+	           }
+	           break;
+	       }
+	       case 0:
+	       	{
+		        fptr3=fopen("sales.txt","a");
+		        fprintf(fptr3,"\n\n%s %s",da,cnam);
+		        printf("\n\n%s %s",da,cnam);
+		        for(i=0;i<n;i++)
+	        	{
+			       printf("\n\t%s  %ld * %ld  = %ld",book[i],price[i],count[i],cost[i]);
+			       fprintf(fptr3,"\n\t%s  %ld * %ld  = %ld",book[i],price[i],count[i],cost[i]);
+			       total=total+cost[i];
+		        }
+		        printf("\n\t\t\t\tTOTAL AMOUNT IS %ld",total);
+		        fprintf(fptr3,"\n\t\t\t\tTOTAL AMOUNT IS %ld",total);
+		        fclose(fptr3);
+		        break;
+           }
+           getch();
+        }    	
+	}while(ch!=0);
+}
+void search()
+{
+	FILE *fp;
+	char b_a_nam[100],bnam[100],aut[100],loc[100],*b,*a;
+	int price,count,flag;
+	printf("\nEnter related book name or author name  :: ");
+	scanf("%s",b_a_nam);
+	fp=fopen("Record.txt","r");
+	while(fscanf(fp,"%s %s %s %ld %ld",bnam,aut,loc,&price,&count)!=EOF)
+	{
+		b = strstr(bnam,b_a_nam);
+		a = strstr(aut,b_a_nam);
+		if((b)||(a))
+		{
+			flag=1;
+			printf("\n\nName of the Book                                                 :: %s",bnam);
+			printf("\nName of the Author                                               :: %s",aut);
+			printf("\nBook location (Alphabet refers the rack number refers the shelf) :: %s",loc);
+			printf("\nPrice of the book                                                :: %ld Rs/-",price);
+			printf("\nAvailablity of stock                                             :: %ld numbers",count);
+			
+		}
+	} //end of while loop
+	if(flag!=1)
+	{
+		printf("\n\t\t\t\tNo such record found!!!!!");
+		printf("\n\tPlease enter the choice as <1> in the choice list to create a record!! ");
+	}
+	fclose(fp);
+}
+
+int main()
+{
+	mainmenu();
 	return 0;
-	 
-  }
+}
